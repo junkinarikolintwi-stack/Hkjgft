@@ -1,0 +1,1606 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AniVault</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#070710;--bg2:#0d0d1a;--bg3:#13132a;--bg4:#1c1c35;
+  --accent:#e63946;--accent2:#ff4d5e;--gold:#f4c542;
+  --text:#eeeef5;--text2:#8888aa;--text3:#555577;
+  --border:#1e1e3a;--card:#0f0f22;
+  --green:#00e5a0;--blue:#4fc3f7;
+  --grad1:linear-gradient(135deg,#e63946,#8b1a2a);
+}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+::-webkit-scrollbar{width:5px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:#2a2a55;border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:var(--accent)}
+
+/* ── BUTTONS ── */
+.btn{display:inline-flex;align-items:center;gap:7px;padding:9px 20px;border-radius:8px;border:none;cursor:pointer;font-family:'Inter',sans-serif;font-weight:600;font-size:13px;transition:all .2s;text-decoration:none}
+.btn-accent{background:var(--accent);color:#fff;box-shadow:0 4px 20px rgba(230,57,70,.35)}
+.btn-accent:hover{background:var(--accent2);transform:translateY(-1px);box-shadow:0 6px 24px rgba(230,57,70,.5)}
+.btn-glass{background:rgba(255,255,255,.08);color:var(--text);border:1px solid rgba(255,255,255,.12);backdrop-filter:blur(10px)}
+.btn-glass:hover{background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.22)}
+.btn-outline{background:transparent;color:var(--text);border:1px solid var(--border)}
+.btn-outline:hover{border-color:var(--accent);color:var(--accent)}
+.btn-sm{padding:6px 14px;font-size:12px}
+.btn-xs{padding:4px 10px;font-size:11px;border-radius:6px}
+
+/* ── INPUTS ── */
+input,select,textarea{background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:10px 14px;border-radius:8px;font-family:'Inter',sans-serif;font-size:14px;width:100%;outline:none;transition:border .2s}
+input:focus,select:focus,textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(230,57,70,.12)}
+textarea{resize:vertical;min-height:80px}
+select option{background:var(--bg3)}
+label{font-size:11px;color:var(--text2);font-weight:600;display:block;margin-bottom:5px;letter-spacing:.04em;text-transform:uppercase}
+
+/* ── TAGS ── */
+.tag{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;letter-spacing:.02em}
+.tag-red{background:rgba(230,57,70,.18);color:#ff7b87;border:1px solid rgba(230,57,70,.25)}
+.tag-gold{background:rgba(244,197,66,.12);color:var(--gold);border:1px solid rgba(244,197,66,.2)}
+.tag-blue{background:rgba(79,195,247,.12);color:var(--blue);border:1px solid rgba(79,195,247,.2)}
+.tag-gray{background:rgba(255,255,255,.06);color:var(--text2);border:1px solid rgba(255,255,255,.08)}
+.tag-green{background:rgba(0,229,160,.12);color:var(--green);border:1px solid rgba(0,229,160,.2)}
+
+/* ══════════════════════════════════════
+   PUBLIC NAV
+══════════════════════════════════════ */
+#main-nav{position:fixed;top:0;left:0;right:0;z-index:900;height:62px;display:flex;align-items:center;padding:0 32px;gap:32px;transition:all .4s}
+#main-nav.scrolled{background:rgba(7,7,16,.92);backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,.05);box-shadow:0 4px 32px rgba(0,0,0,.4)}
+.nav-logo{font-family:'Bebas Neue';font-size:28px;color:var(--accent);letter-spacing:.12em;cursor:pointer;flex-shrink:0;text-shadow:0 0 30px rgba(230,57,70,.4)}
+.nav-links{display:flex;gap:4px;flex:1}
+.nav-link{padding:7px 14px;border-radius:7px;font-size:13px;font-weight:500;color:var(--text2);cursor:pointer;transition:all .2s;border:none;background:none;letter-spacing:.01em}
+.nav-link:hover{color:var(--text)}
+.nav-link.active{color:var(--text);background:rgba(255,255,255,.07)}
+.nav-search{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);border-radius:24px;padding:7px 16px;cursor:text;transition:all .2s;min-width:200px}
+.nav-search:hover{background:rgba(255,255,255,.09);border-color:rgba(255,255,255,.14)}
+.nav-search input{background:none;border:none;color:var(--text);font-size:13px;width:100%;padding:0}
+.nav-search input::placeholder{color:var(--text3)}
+.nav-search input:focus{box-shadow:none}
+
+/* ══════════════════════════════════════
+   HERO — FULL CINEMATIC
+══════════════════════════════════════ */
+#hero-section{position:relative;height:100vh;min-height:600px;overflow:hidden}
+.hero-slide{position:absolute;inset:0;opacity:0;transition:opacity 1s ease}
+.hero-slide.active{opacity:1}
+.hero-bg{position:absolute;inset:0;background-size:cover;background-position:center;transition:transform 8s ease}
+.hero-slide.active .hero-bg{transform:scale(1.06)}
+.hero-vignette{position:absolute;inset:0;background:linear-gradient(to top,var(--bg) 0%,rgba(7,7,16,.7) 40%,rgba(7,7,16,.2) 70%,transparent 100%)}
+.hero-side{position:absolute;inset:0;background:linear-gradient(to right,rgba(7,7,16,.9) 0%,rgba(7,7,16,.5) 40%,transparent 70%)}
+.hero-content{position:absolute;bottom:120px;left:72px;max-width:560px;z-index:2}
+.hero-eyebrow{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.hero-eyebrow-line{width:32px;height:2px;background:var(--accent);border-radius:1px}
+.hero-eyebrow-text{font-size:11px;font-weight:700;color:var(--accent);letter-spacing:.18em;text-transform:uppercase}
+.hero-title{font-family:'Bebas Neue';font-size:72px;line-height:.95;color:#fff;margin-bottom:16px;letter-spacing:.03em;text-shadow:0 4px 40px rgba(0,0,0,.6)}
+.hero-meta{display:flex;align-items:center;gap:14px;margin-bottom:14px;flex-wrap:wrap}
+.hero-meta-item{font-size:12px;color:var(--text2);display:flex;align-items:center;gap:5px}
+.hero-dot-sep{width:3px;height:3px;border-radius:50%;background:var(--text3)}
+.hero-desc{font-size:15px;color:rgba(238,238,245,.75);line-height:1.65;margin-bottom:24px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;font-weight:300}
+.hero-actions{display:flex;gap:10px;flex-wrap:wrap}
+.hero-dots{position:absolute;bottom:36px;left:72px;display:flex;gap:8px;z-index:10}
+.hero-dot{width:28px;height:3px;border-radius:2px;background:rgba(255,255,255,.2);cursor:pointer;transition:all .4s}
+.hero-dot.active{background:var(--accent);width:48px}
+.hero-num{position:absolute;bottom:36px;right:72px;font-family:'Bebas Neue';font-size:18px;color:rgba(255,255,255,.3);letter-spacing:.08em;z-index:10}
+
+/* ══════════════════════════════════════
+   TRENDING STRIP  (below hero)
+══════════════════════════════════════ */
+#trending-strip{background:linear-gradient(to right,rgba(230,57,70,.12),rgba(230,57,70,.04));border-top:1px solid rgba(230,57,70,.2);border-bottom:1px solid rgba(230,57,70,.08);padding:14px 32px;display:flex;align-items:center;gap:20px;overflow:hidden}
+.trending-label{font-size:11px;font-weight:700;color:var(--accent);letter-spacing:.14em;text-transform:uppercase;white-space:nowrap;display:flex;align-items:center;gap:8px;flex-shrink:0}
+.trending-label::before{content:'';width:8px;height:8px;border-radius:50%;background:var(--accent);animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.8)}}
+.trending-scroll{display:flex;gap:16px;overflow:hidden;flex:1}
+.trending-item{white-space:nowrap;font-size:13px;color:var(--text2);cursor:pointer;transition:color .2s;flex-shrink:0}
+.trending-item:hover{color:var(--accent)}
+.trending-item span{color:var(--text3);margin-right:6px;font-family:'Bebas Neue';font-size:14px}
+
+/* ══════════════════════════════════════
+   SECTIONS
+══════════════════════════════════════ */
+.section{padding:52px 32px}
+.section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px}
+.section-title-wrap{display:flex;align-items:center;gap:12px}
+.section-badge{width:4px;height:28px;background:var(--grad1);border-radius:2px;flex-shrink:0}
+.section-title{font-family:'Bebas Neue';font-size:26px;color:var(--text);letter-spacing:.06em}
+.section-subtitle{font-size:13px;color:var(--text3);margin-top:2px}
+.see-all{font-size:12px;font-weight:600;color:var(--text2);cursor:pointer;display:flex;align-items:center;gap:5px;transition:color .2s;background:none;border:none;padding:0}
+.see-all:hover{color:var(--accent)}
+
+/* ── FEATURED ROW (large cards) ── */
+.featured-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:18px}
+.featured-card{position:relative;border-radius:12px;overflow:hidden;cursor:pointer;aspect-ratio:16/9;background:var(--bg3)}
+.featured-card-img{width:100%;height:100%;object-fit:cover;transition:transform .5s ease}
+.featured-card:hover .featured-card-img{transform:scale(1.05)}
+.featured-card-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(7,7,16,.95) 0%,rgba(7,7,16,.4) 50%,transparent 100%);opacity:.8;transition:opacity .3s}
+.featured-card:hover .featured-card-overlay{opacity:1}
+.featured-card-body{position:absolute;bottom:0;left:0;right:0;padding:16px}
+.featured-card-title{font-family:'Bebas Neue';font-size:20px;letter-spacing:.04em;margin-bottom:6px;line-height:1.1}
+.featured-card-meta{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.featured-card-play{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:48px;height:48px;border-radius:50%;background:rgba(230,57,70,.9);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .3s;font-size:18px}
+.featured-card:hover .featured-card-play{opacity:1}
+
+/* ── POSTER GRID ── */
+.poster-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:16px}
+.poster-card{cursor:pointer;border-radius:10px;overflow:hidden;background:var(--bg3);transition:transform .25s;position:relative;border:1px solid rgba(255,255,255,.04)}
+.poster-card:hover{transform:translateY(-5px)}
+.poster-card-img{width:100%;aspect-ratio:2/3;object-fit:cover;display:block;transition:transform .4s}
+.poster-card:hover .poster-card-img{transform:scale(1.04)}
+.poster-card-body{padding:10px 10px 12px}
+.poster-card-title{font-size:13px;font-weight:600;line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;color:var(--text)}
+.poster-card-meta{font-size:11px;color:var(--text3);margin-top:4px}
+.poster-card-overlay{position:absolute;inset:0;background:rgba(230,57,70,.08);opacity:0;transition:opacity .25s;border-radius:10px}
+.poster-card:hover .poster-card-overlay{opacity:1}
+.poster-type-badge{position:absolute;top:8px;left:8px}
+
+/* ── CONTINUE WATCHING ── */
+.cw-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px}
+.cw-card{background:var(--bg3);border:1px solid var(--border);border-radius:10px;overflow:hidden;cursor:pointer;transition:all .25s}
+.cw-card:hover{border-color:rgba(230,57,70,.4);transform:translateY(-3px)}
+.cw-thumb{width:100%;height:110px;object-fit:cover;display:block}
+.cw-bar-wrap{height:3px;background:rgba(255,255,255,.08)}
+.cw-bar{height:100%;background:var(--grad1);border-radius:0 1px 1px 0}
+.cw-info{padding:10px 12px}
+.cw-title{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cw-ep{font-size:11px;color:var(--text3);margin-top:3px}
+
+/* ── GENRES FILTER ── */
+.genre-bar{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;margin-bottom:22px;scrollbar-width:none}
+.genre-bar::-webkit-scrollbar{display:none}
+.genre-chip{flex-shrink:0;padding:6px 16px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid var(--border);color:var(--text2);background:transparent;transition:all .2s}
+.genre-chip.active{background:var(--accent);border-color:var(--accent);color:#fff;box-shadow:0 3px 14px rgba(230,57,70,.35)}
+.genre-chip:hover:not(.active){border-color:rgba(255,255,255,.2);color:var(--text)}
+
+/* ── SPOTLIGHT (big feature) ── */
+#spotlight{padding:0 32px 52px}
+.spotlight-inner{position:relative;border-radius:20px;overflow:hidden;background:var(--bg2);border:1px solid var(--border)}
+.spotlight-bg{width:100%;height:380px;object-fit:cover;opacity:.35;display:block}
+.spotlight-overlay{position:absolute;inset:0;background:linear-gradient(to right,var(--bg2) 30%,transparent)}
+.spotlight-body{position:absolute;inset:0;display:flex;align-items:center;padding:52px}
+.spotlight-poster{width:160px;border-radius:10px;border:2px solid rgba(255,255,255,.1);flex-shrink:0;box-shadow:0 20px 60px rgba(0,0,0,.6)}
+.spotlight-info{margin-left:32px}
+.spotlight-new{font-size:10px;font-weight:700;color:var(--accent);letter-spacing:.18em;text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.spotlight-new::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--accent);animation:pulse 1.5s infinite}
+.spotlight-title{font-family:'Bebas Neue';font-size:52px;line-height:1;margin-bottom:12px;letter-spacing:.04em}
+.spotlight-desc{font-size:14px;color:var(--text2);line-height:1.65;max-width:480px;margin-bottom:20px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+
+/* ══════════════════════════════════════
+   DETAIL PAGE
+══════════════════════════════════════ */
+.detail-hero{position:relative;height:440px;overflow:hidden;margin-top:62px}
+.detail-hero-bg{position:absolute;inset:0;background-size:cover;background-position:center top;filter:brightness(.3)}
+.detail-hero-overlay{position:absolute;inset:0;background:linear-gradient(to top,var(--bg) 25%,transparent)}
+.detail-body{position:relative;z-index:2;padding:0 48px 40px;margin-top:-220px}
+.detail-grid{display:grid;grid-template-columns:220px 1fr;gap:36px;align-items:start}
+@media(max-width:680px){.detail-grid{grid-template-columns:1fr}.detail-poster{max-width:160px}}
+.detail-poster{width:100%;border-radius:12px;border:2px solid rgba(255,255,255,.1);box-shadow:0 20px 60px rgba(0,0,0,.7)}
+.detail-title{font-family:'Bebas Neue';font-size:52px;line-height:1;color:#fff;margin-bottom:12px;letter-spacing:.04em}
+.detail-synopsis{font-size:14px;color:var(--text2);line-height:1.75;margin:16px 0;max-width:680px}
+.genres-wrap{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0}
+.ep-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:10px;max-height:480px;overflow-y:auto;padding-right:4px}
+.ep-row{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px 16px;cursor:pointer;display:flex;align-items:center;gap:14px;transition:all .2s}
+.ep-row:hover{border-color:rgba(230,57,70,.4);background:var(--bg3)}
+.ep-num{font-family:'Bebas Neue';font-size:26px;color:var(--accent);min-width:40px;line-height:1}
+.ep-details{flex:1}
+.ep-title{font-size:13px;font-weight:600;margin-bottom:3px}
+.ep-desc-text{font-size:12px;color:var(--text3);display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden}
+.ep-play-btn{width:34px;height:34px;border-radius:50%;background:rgba(230,57,70,.15);border:1px solid rgba(230,57,70,.3);display:flex;align-items:center;justify-content:center;color:var(--accent);font-size:13px;flex-shrink:0;transition:all .2s}
+.ep-row:hover .ep-play-btn{background:var(--accent);color:#fff;border-color:var(--accent)}
+
+/* ── PLAYER ── */
+.player-container{margin-top:62px}
+.player-frame{width:100%;aspect-ratio:16/9;background:#000}
+.player-frame iframe{width:100%;height:100%;border:none;display:block}
+.player-info{padding:24px 48px}
+.player-title{font-family:'Bebas Neue';font-size:32px;letter-spacing:.04em}
+.player-ep-nav{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap}
+
+/* ══════════════════════════════════════
+   SEARCH RESULTS
+══════════════════════════════════════ */
+.search-page{margin-top:62px;padding:40px 32px}
+.search-title{font-family:'Bebas Neue';font-size:32px;margin-bottom:6px}
+.search-sub{font-size:14px;color:var(--text3);margin-bottom:28px}
+
+/* ══════════════════════════════════════
+   ADMIN — HIDDEN
+══════════════════════════════════════ */
+.admin-wrap{display:flex;height:100vh;overflow:hidden}
+.admin-sidebar{width:230px;background:#08081a;border-right:1px solid #111130;display:flex;flex-direction:column;flex-shrink:0;overflow-y:auto}
+.admin-logo-bar{padding:20px 20px 16px;border-bottom:1px solid #111130}
+.admin-logo-text{font-family:'Bebas Neue';font-size:22px;color:var(--accent);letter-spacing:.1em}
+.admin-logo-sub{font-size:10px;color:var(--text3);letter-spacing:.1em;text-transform:uppercase;margin-top:2px}
+.admin-user-bar{padding:14px 20px;border-bottom:1px solid #111130}
+.admin-user-name{font-weight:700;font-size:14px}
+.admin-user-role{font-size:11px;color:var(--accent);font-weight:600;margin-top:2px}
+.sidebar-nav{flex:1;padding:10px 0}
+.s-item{display:flex;align-items:center;gap:10px;padding:11px 20px;font-size:13px;font-weight:500;color:var(--text2);cursor:pointer;transition:all .2s;border-left:3px solid transparent}
+.s-item:hover{color:var(--text);background:rgba(255,255,255,.04)}
+.s-item.active{color:var(--accent);background:rgba(230,57,70,.07);border-left-color:var(--accent)}
+.s-sep{height:1px;background:#111130;margin:8px 20px}
+.s-label{padding:10px 20px 4px;font-size:10px;font-weight:700;color:var(--text3);letter-spacing:.12em;text-transform:uppercase}
+.admin-main{flex:1;overflow-y:auto;display:flex;flex-direction:column}
+.admin-bar{background:#08081a;border-bottom:1px solid #111130;padding:0 24px;height:54px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.admin-page-wrap{padding:24px;flex:1}
+
+/* ── STATS ── */
+.stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin-bottom:24px}
+.stat-box{background:#0c0c20;border:1px solid #111130;border-radius:12px;padding:18px}
+.stat-n{font-family:'Bebas Neue';font-size:40px;color:var(--accent);line-height:1}
+.stat-l{font-size:12px;color:var(--text2);font-weight:600;margin-top:2px}
+
+/* ── TMDB GRID ── */
+.tmdb-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;margin-top:14px;max-height:440px;overflow-y:auto}
+.tmdb-card{background:var(--bg3);border:1px solid var(--border);border-radius:8px;overflow:hidden;cursor:pointer;transition:all .2s;position:relative}
+.tmdb-card:hover{border-color:rgba(230,57,70,.5);transform:translateY(-2px)}
+.tmdb-card-img{width:100%;aspect-ratio:2/3;object-fit:cover;display:block}
+.tmdb-hover{position:absolute;inset:0;background:rgba(230,57,70,.85);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;opacity:0;transition:opacity .2s}
+.tmdb-card:hover .tmdb-hover{opacity:1}
+.tmdb-card-info{padding:8px}
+.tmdb-card-title{font-size:11px;font-weight:600;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:1.3}
+.tmdb-card-year{font-size:10px;color:var(--text3);margin-top:2px}
+
+/* ── CODE VIEWER ── */
+.code-area{background:#050510;border:1px solid #111130;border-radius:10px;overflow:auto;flex:1}
+.code-area pre{padding:20px;font-family:'JetBrains Mono',monospace;font-size:12px;line-height:1.75;color:#cdd6f4;white-space:pre}
+
+/* ── DATA TABLE ── */
+.dtable{width:100%;border-collapse:collapse;font-size:13px}
+.dtable th{text-align:left;padding:10px 14px;font-size:10px;font-weight:700;color:var(--text3);letter-spacing:.1em;text-transform:uppercase;border-bottom:1px solid #111130;background:#08081a}
+.dtable td{padding:10px 14px;border-bottom:1px solid rgba(17,17,48,.8);vertical-align:middle}
+.dtable tr:hover td{background:rgba(255,255,255,.02)}
+
+/* ── MODAL ── */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:3000;display:flex;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px)}
+.modal-box{background:#0d0d1e;border:1px solid #1a1a35;border-radius:16px;padding:28px;max-width:520px;width:100%;max-height:88vh;overflow-y:auto;position:relative}
+.modal-title{font-family:'Bebas Neue';font-size:26px;margin-bottom:18px;letter-spacing:.04em}
+.modal-x{position:absolute;top:16px;right:18px;background:none;border:none;color:var(--text2);font-size:22px;cursor:pointer;line-height:1;transition:color .2s}
+.modal-x:hover{color:var(--text)}
+.form-row{margin-bottom:16px}
+
+/* ── AUTH ── */
+.auth-page{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;background:radial-gradient(ellipse at 50% 0%,rgba(230,57,70,.08) 0%,transparent 60%),var(--bg)}
+.auth-box{background:#0d0d1e;border:1px solid #1a1a35;border-radius:20px;padding:40px;max-width:400px;width:100%}
+.auth-logo{font-family:'Bebas Neue';font-size:42px;color:var(--accent);text-align:center;letter-spacing:.14em;text-shadow:0 0 30px rgba(230,57,70,.35)}
+.auth-tagline{text-align:center;font-size:12px;color:var(--text3);margin-bottom:28px;letter-spacing:.06em;text-transform:uppercase}
+.auth-tab-row{display:flex;border-bottom:1px solid #1a1a35;margin-bottom:22px}
+.auth-tab{padding:9px 18px;font-size:13px;font-weight:600;color:var(--text3);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;background:none;border-top:none;border-left:none;border-right:none;transition:all .2s}
+.auth-tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+
+/* ── VISIBILITY ── */
+.vis-pub{background:rgba(0,229,160,.12);color:var(--green);font-size:10px;font-weight:700;padding:3px 9px;border-radius:12px;border:1px solid rgba(0,229,160,.2)}
+.vis-hid{background:rgba(244,197,66,.1);color:var(--gold);font-size:10px;font-weight:700;padding:3px 9px;border-radius:12px}
+.vis-pri{background:rgba(79,195,247,.1);color:var(--blue);font-size:10px;font-weight:700;padding:3px 9px;border-radius:12px}
+
+/* ── MISC ── */
+.spinner{display:inline-block;width:22px;height:22px;border:2px solid rgba(255,255,255,.1);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-row{display:flex;align-items:center;justify-content:center;padding:48px;gap:12px;color:var(--text3);font-size:13px}
+.back-btn{display:inline-flex;align-items:center;gap:7px;font-size:13px;font-weight:600;color:var(--text3);cursor:pointer;padding:7px 0;margin-bottom:14px;transition:color .2s;background:none;border:none}
+.back-btn:hover{color:var(--text)}
+hr{border:none;border-top:1px solid #111130;margin:18px 0}
+.empty{text-align:center;padding:48px 20px;color:var(--text3)}
+.empty-ico{font-size:44px;margin-bottom:12px;opacity:.5}
+.toast-wrap{position:fixed;bottom:24px;right:24px;z-index:9999;display:flex;flex-direction:column;gap:8px;pointer-events:none}
+.toast{background:#0d0d22;border:1px solid #1a1a38;border-radius:10px;padding:13px 18px;font-size:13px;animation:toastIn .3s ease;min-width:220px;font-weight:500}
+.toast.ok{border-color:rgba(0,229,160,.4);color:var(--green)}
+.toast.err{border-color:rgba(230,57,70,.4);color:#ff7b87}
+.toast.inf{border-color:rgba(79,195,247,.3);color:var(--blue)}
+@keyframes toastIn{from{transform:translateX(110%);opacity:0}to{transform:translateX(0);opacity:1}}
+
+/* ── RESPONSIVE ── */
+@media(max-width:768px){
+  .hero-content{left:24px;right:24px;bottom:100px}
+  .hero-title{font-size:48px}
+  .hero-dots{left:24px}.hero-num{right:24px}
+  .section{padding:36px 16px}
+  #trending-strip{padding:12px 16px}
+  .detail-body{padding:0 16px 32px}
+  .detail-title{font-size:38px}
+  #spotlight{padding:0 16px 36px}
+  .player-info{padding:20px 16px}
+}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div class="toast-wrap" id="toasts"></div>
+
+<script>
+// ═══════════════════════════════════════════
+//  CONFIG
+// ═══════════════════════════════════════════
+const TMDB_KEY = 'cc5b94165972aa509a349161d13d4fc9';
+const TMDB_BASE = 'https://api.themoviedb.org/3';
+const IMG = 'https://image.tmdb.org/t/p/original';
+const SECRET_PATH = 'secret-admin-9x7k';  // URL secreta
+
+// ═══════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════
+let S = {
+  page: 'home',
+  admin: 'dashboard',
+  codesPage: 'api',
+  user: null,
+  animeId: null,
+  epNum: null,
+  heroIdx: 0,
+  heroCount: 0,
+  searchQ: '',
+  filterGenre: 'Todos',
+  filterType: 'all',
+  tmdbQ: '',
+  tmdbResults: [],
+  tmdbLoading: false,
+  epModal: null,
+  bulkId: null,
+  epAnimeId: null,
+};
+
+// ═══════════════════════════════════════════
+//  DB (localStorage)
+// ═══════════════════════════════════════════
+const DB = {
+  g(k,d){try{const v=localStorage.getItem('av_'+k);return v!=null?JSON.parse(v):d}catch{return d}},
+  s(k,v){localStorage.setItem('av_'+k,JSON.stringify(v))},
+  users(){return this.g('users',[{id:'owner',username:'Owner',email:'owner@anivault.tv',password:'AniVault2024!',role:'admin',created:Date.now()}])},
+  saveUsers(u){this.s('users',u)},
+  anime(){return this.g('anime',[])},
+  saveAnime(a){this.s('anime',a)},
+  watched(){return this.g('watched',{})},
+  saveWatched(w){this.s('watched',w)},
+};
+
+// ═══════════════════════════════════════════
+//  INTERNAL API
+// ═══════════════════════════════════════════
+const API = {
+  all(){return DB.anime().filter(a=>a.vis==='public')},
+  series(){return this.all().filter(a=>a.type==='series')},
+  movies(){return this.all().filter(a=>a.type==='movie')},
+  byId(id){return DB.anime().find(a=>a.id==id)},
+  eps(id){const a=DB.anime().find(x=>x.id==id);return a?a.eps:[]},
+  search(q){return this.all().filter(a=>a.title.toLowerCase().includes(q.toLowerCase()))},
+  genres(){return[...new Set(this.all().flatMap(a=>a.genres||[]))]},
+  userAnime(uid){return DB.anime().filter(a=>a.uid===uid)},
+};
+
+// ═══════════════════════════════════════════
+//  TMDB
+// ═══════════════════════════════════════════
+async function tmSearch(q){
+  try{
+    const r=await fetch(`${TMDB_BASE}/search/multi?api_key=${TMDB_KEY}&query=${encodeURIComponent(q)}&language=en-US`);
+    const d=await r.json();
+    return(d.results||[]).filter(x=>x.media_type==='tv'||x.media_type==='movie').slice(0,24);
+  }catch{toast('Error conectando con TMDb','err');return[];}
+}
+async function tmDiscover(type){
+  try{
+    const ep=type==='tv'?'discover/tv':'discover/movie';
+    const r=await fetch(`${TMDB_BASE}/${ep}?api_key=${TMDB_KEY}&with_keywords=210024&sort_by=popularity.desc&language=en-US`);
+    const d=await r.json();return d.results||[];
+  }catch{return[];}
+}
+async function tmDetail(id,type){
+  try{
+    const r=await fetch(`${TMDB_BASE}/${type==='movie'?'movie':'tv'}/${id}?api_key=${TMDB_KEY}&language=en-US`);
+    return await r.json();
+  }catch{return null;}
+}
+
+// ═══════════════════════════════════════════
+//  HELPERS
+// ═══════════════════════════════════════════
+function img(p){
+  if(!p)return"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='450'%3E%3Crect fill='%2313132a' width='300' height='450'/%3E%3Ctext fill='%23333' x='50%25' y='50%25' text-anchor='middle' font-size='60'%3E%F0%9F%8E%8C%3C/text%3E%3C/svg%3E";
+  return p.startsWith('http')?p:IMG+p;
+}
+function imgw(p){return p?IMG.replace('original','w780')+p:img('');}
+function gid(){return Date.now()+Math.floor(Math.random()*9999)}
+function vcls(v){return v==='public'?'vis-pub':v==='hidden'?'vis-hid':'vis-pri'}
+function nav(page,data={}){Object.assign(S,{page},data);render();window.scrollTo(0,0);}
+function logout(){S.user=null;S.page='home';render();toast('Sesión cerrada','inf');}
+
+function toast(msg,type='inf'){
+  const w=document.getElementById('toasts');if(!w)return;
+  const t=document.createElement('div');t.className=`toast ${type}`;t.textContent=msg;
+  w.appendChild(t);setTimeout(()=>t.remove(),3400);
+}
+
+// hero timer
+let heroT=null;
+function startHero(n){
+  if(heroT)clearInterval(heroT);if(n<=1)return;
+  heroT=setInterval(()=>{
+    S.heroIdx=(S.heroIdx+1)%n;
+    document.querySelectorAll('.hero-slide').forEach((s,i)=>s.classList.toggle('active',i===S.heroIdx));
+    document.querySelectorAll('.hero-dot').forEach((d,i)=>d.classList.toggle('active',i===S.heroIdx));
+    const numEl=document.getElementById('hero-num');
+    if(numEl)numEl.textContent=String(S.heroIdx+1).padStart(2,'0')+' / '+String(n).padStart(2,'0');
+  },5500);
+}
+
+// nav scroll effect
+function initNavScroll(){
+  const nav=document.getElementById('main-nav');if(!nav)return;
+  const onScroll=()=>nav.classList.toggle('scrolled',window.scrollY>60);
+  window.addEventListener('scroll',onScroll,{passive:true});onScroll();
+}
+
+// ═══════════════════════════════════════════
+//  RENDER ROUTER
+// ═══════════════════════════════════════════
+function render(){
+  const app=document.getElementById('app');if(!app)return;
+  if(S.page==='admin-secret'){
+    if(!S.user){app.innerHTML=renderAuth();return;}
+    app.innerHTML=renderAdmin();return;
+  }
+  app.innerHTML=renderNav()+renderPage();
+  initNavScroll();
+  if(S.page==='home'){
+    const a=API.all();S.heroCount=Math.min(a.length,6);
+    if(S.heroIdx>=S.heroCount)S.heroIdx=0;
+    startHero(S.heroCount);
+  }
+}
+
+// ═══════════════════════════════════════════
+//  PUBLIC NAV
+// ═══════════════════════════════════════════
+function renderNav(){
+  return`<nav id="main-nav">
+    <div class="nav-logo" onclick="nav('home')">ANIVAULT</div>
+    <div class="nav-links">
+      <button class="nav-link ${S.page==='home'?'active':''}" onclick="nav('home')">Inicio</button>
+      <button class="nav-link ${S.page==='series'?'active':''}" onclick="nav('series')">Series</button>
+      <button class="nav-link ${S.page==='movies'?'active':''}" onclick="nav('movies')">Películas</button>
+    </div>
+    <div class="nav-search">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:#555577;flex-shrink:0"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input id="nav-search-inp" placeholder="Buscar anime..." value="${S.searchQ}"
+        oninput="S.searchQ=this.value"
+        onkeydown="if(event.key==='Enter'&&this.value.trim()){nav('search');}">
+    </div>
+  </nav>`;
+}
+
+// ═══════════════════════════════════════════
+//  PUBLIC PAGES
+// ═══════════════════════════════════════════
+function renderPage(){
+  if(S.page==='home')return renderHome();
+  if(S.page==='series')return renderCatalogPage('series');
+  if(S.page==='movies')return renderCatalogPage('movies');
+  if(S.page==='search')return renderSearchPage();
+  if(S.page==='detail')return renderDetail();
+  if(S.page==='player')return renderPlayer();
+  return renderHome();
+}
+
+// ─── HOME ───────────────────────────────────
+function renderHome(){
+  const all=API.all();
+  const heroes=all.slice(0,6);
+  const watched=DB.watched();
+  const cwItems=Object.values(watched).filter(w=>{const a=API.byId(w.aid);return a&&a.vis==='public';}).slice(0,8);
+  const newAdded=all.slice(0,12);
+  const topSeries=API.series().slice(0,10);
+  const topMovies=API.movies().slice(0,10);
+  const spotlight=all.find(a=>a.type==='series')||all[0];
+
+  // HERO
+  let heroHTML='';
+  if(!heroes.length){
+    heroHTML=`<div style="height:100vh;display:flex;align-items:center;justify-content:center;background:radial-gradient(ellipse at 50% 30%,rgba(230,57,70,.1),transparent 60%)">
+      <div style="text-align:center">
+        <div style="font-family:'Bebas Neue';font-size:72px;color:var(--accent);letter-spacing:.1em;text-shadow:0 0 60px rgba(230,57,70,.4)">ANIVAULT</div>
+        <div style="font-size:15px;color:var(--text2);margin-top:8px;margin-bottom:28px">Tu plataforma de anime favorita</div>
+        <button class="btn btn-accent" onclick="nav('admin-secret')">Comenzar</button>
+      </div>
+    </div>`;
+  } else {
+    heroHTML=`<section id="hero-section">
+      ${heroes.map((a,i)=>`
+        <div class="hero-slide ${i===S.heroIdx?'active':''}">
+          <div class="hero-bg" style="background-image:url('${img(a.banner||a.poster)}')"></div>
+          <div class="hero-vignette"></div>
+          <div class="hero-side"></div>
+          <div class="hero-content">
+            <div class="hero-eyebrow">
+              <div class="hero-eyebrow-line"></div>
+              <div class="hero-eyebrow-text">${a.type==='movie'?'Película Anime':'Serie Anime'}</div>
+            </div>
+            <div class="hero-title">${a.title}</div>
+            <div class="hero-meta">
+              ${a.year?`<div class="hero-meta-item">${a.year}</div><div class="hero-dot-sep"></div>`:''}
+              ${a.genres?.length?`<div class="hero-meta-item">${a.genres.slice(0,2).join(' · ')}</div><div class="hero-dot-sep"></div>`:''}
+              <div class="hero-meta-item">${a.eps?.length||0} ep${a.eps?.length!==1?'s':''}</div>
+            </div>
+            <div class="hero-desc">${a.synopsis||''}</div>
+            <div class="hero-actions">
+              <button class="btn btn-accent" onclick="nav('player',{animeId:${a.id},epNum:1})">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg>
+                Reproducir
+              </button>
+              <button class="btn btn-glass" onclick="nav('detail',{animeId:${a.id}})">Más Info</button>
+            </div>
+          </div>
+        </div>`).join('')}
+      <div class="hero-dots">${heroes.map((_,i)=>`<div class="hero-dot ${i===S.heroIdx?'active':''}" onclick="heroGo(${i})"></div>`).join('')}</div>
+      <div class="hero-num" id="hero-num">${String(S.heroIdx+1).padStart(2,'0')} / ${String(heroes.length).padStart(2,'0')}</div>
+    </section>
+    <div id="trending-strip">
+      <div class="trending-label">En Tendencia</div>
+      <div class="trending-scroll">
+        ${all.slice(0,8).map((a,i)=>`<div class="trending-item" onclick="nav('detail',{animeId:${a.id}})"><span>${String(i+1).padStart(2,'0')}</span>${a.title}</div>`).join('')}
+      </div>
+    </div>`;
+  }
+
+  // CW
+  const cwHTML=cwItems.length?`<div class="section" style="padding-top:36px">
+    <div class="section-header">
+      <div class="section-title-wrap">
+        <div class="section-badge"></div>
+        <div><div class="section-title">Continuar Viendo</div></div>
+      </div>
+    </div>
+    <div class="cw-row">${cwItems.map(w=>{
+      const a=API.byId(w.aid);if(!a)return'';
+      const pct=Math.min(Math.round((w.ep/(a.eps?.length||1))*100),100);
+      return`<div class="cw-card" onclick="nav('player',{animeId:${a.id},epNum:${w.ep}})">
+        <img class="cw-thumb" src="${img(a.banner||a.poster)}" loading="lazy">
+        <div class="cw-bar-wrap"><div class="cw-bar" style="width:${pct}%"></div></div>
+        <div class="cw-info">
+          <div class="cw-title">${a.title}</div>
+          <div class="cw-ep">Episodio ${w.ep} · ${pct}% completado</div>
+        </div>
+      </div>`;
+    }).join('')}</div>
+  </div>`:'';
+
+  // SPOTLIGHT
+  const spHTML=spotlight?`<section id="spotlight">
+    <div class="spotlight-inner">
+      <img class="spotlight-bg" src="${img(spotlight.banner||spotlight.poster)}" loading="lazy">
+      <div class="spotlight-overlay"></div>
+      <div class="spotlight-body">
+        <img class="spotlight-poster" src="${img(spotlight.poster)}" loading="lazy">
+        <div class="spotlight-info">
+          <div class="spotlight-new">Destacado</div>
+          <div class="spotlight-title">${spotlight.title}</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px">${(spotlight.genres||[]).slice(0,3).map(g=>`<span class="tag tag-gray">${g}</span>`).join('')}</div>
+          <div class="spotlight-desc">${spotlight.synopsis||''}</div>
+          <div style="display:flex;gap:10px">
+            <button class="btn btn-accent" onclick="nav('player',{animeId:${spotlight.id},epNum:1})">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg>
+              Ver Ahora
+            </button>
+            <button class="btn btn-glass" onclick="nav('detail',{animeId:${spotlight.id}})">Detalles</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>`:'';
+
+  // SERIES ROW
+  const seriesHTML=topSeries.length?`<div class="section" style="padding-top:0">
+    <div class="section-header">
+      <div class="section-title-wrap">
+        <div class="section-badge"></div>
+        <div><div class="section-title">Series Populares</div><div class="section-subtitle">Las más vistas del momento</div></div>
+      </div>
+      <button class="see-all" onclick="nav('series')">Ver todo →</button>
+    </div>
+    <div class="poster-row">${renderPosterCards(topSeries)}</div>
+  </div>`:'';
+
+  // MOVIES ROW
+  const moviesHTML=topMovies.length?`<div class="section" style="background:var(--bg2);border-top:1px solid var(--border);border-bottom:1px solid var(--border)">
+    <div class="section-header">
+      <div class="section-title-wrap">
+        <div class="section-badge" style="background:linear-gradient(135deg,var(--blue),#0077a8)"></div>
+        <div><div class="section-title">Películas Anime</div><div class="section-subtitle">Cine de animación japonesa</div></div>
+      </div>
+      <button class="see-all" onclick="nav('movies')">Ver todo →</button>
+    </div>
+    <div class="featured-row">${topMovies.slice(0,4).map(a=>`
+      <div class="featured-card" onclick="nav('detail',{animeId:${a.id}})">
+        <img class="featured-card-img" src="${img(a.banner||a.poster)}" loading="lazy">
+        <div class="featured-card-overlay"></div>
+        <div class="featured-card-play">▶</div>
+        <div class="featured-card-body">
+          <div class="featured-card-title">${a.title}</div>
+          <div class="featured-card-meta">
+            <span class="tag tag-blue">Película</span>
+            ${a.year?`<span style="font-size:11px;color:var(--text3)">${a.year}</span>`:''}
+          </div>
+        </div>
+      </div>`).join('')}
+    </div>
+  </div>`:'';
+
+  // ALL CATALOG
+  const genres=['Todos',...API.genres()];
+  const filtered=S.filterGenre==='Todos'?newAdded:newAdded.filter(a=>(a.genres||[]).includes(S.filterGenre));
+  const catalogHTML=newAdded.length?`<div class="section">
+    <div class="section-header">
+      <div class="section-title-wrap">
+        <div class="section-badge" style="background:linear-gradient(135deg,var(--gold),#b8860b)"></div>
+        <div><div class="section-title">Catálogo Completo</div></div>
+      </div>
+    </div>
+    <div class="genre-bar">${genres.slice(0,12).map(g=>`<button class="genre-chip ${S.filterGenre===g?'active':''}" onclick="S.filterGenre='${g}';refreshHome()">${g}</button>`).join('')}</div>
+    <div id="catalog-grid" class="poster-row">${renderPosterCards(filtered)}</div>
+  </div>`:'';
+
+  return heroHTML+cwHTML+spHTML+seriesHTML+moviesHTML+catalogHTML;
+}
+
+function renderPosterCards(items){
+  if(!items||!items.length)return`<div class="empty" style="grid-column:1/-1"><div class="empty-ico">🔍</div>Sin resultados.</div>`;
+  return items.map(a=>`
+    <div class="poster-card" onclick="nav('detail',{animeId:${a.id}})">
+      <div class="poster-type-badge"><span class="tag ${a.type==='movie'?'tag-blue':'tag-red'}" style="font-size:10px">${a.type==='movie'?'Film':'Serie'}</span></div>
+      <img class="poster-card-img" src="${img(a.poster)}" loading="lazy" onerror="this.src='${img('')}'">
+      <div class="poster-card-overlay"></div>
+      <div class="poster-card-body">
+        <div class="poster-card-title">${a.title}</div>
+        <div class="poster-card-meta">${a.year||''} ${a.eps?.length?'· '+a.eps.length+' eps':''}</div>
+      </div>
+    </div>`).join('');
+}
+
+function refreshHome(){
+  const grid=document.getElementById('catalog-grid');
+  if(!grid)return;
+  const all=API.all();
+  const filtered=S.filterGenre==='Todos'?all:all.filter(a=>(a.genres||[]).includes(S.filterGenre));
+  grid.innerHTML=renderPosterCards(filtered);
+  document.querySelectorAll('.genre-chip').forEach(c=>c.classList.toggle('active',c.textContent===S.filterGenre));
+}
+
+// ─── CATALOG PAGES ──────────────────────────
+function renderCatalogPage(type){
+  const items=type==='series'?API.series():API.movies();
+  return`<div style="margin-top:62px">
+    <div class="section">
+      <div class="section-header">
+        <div class="section-title-wrap">
+          <div class="section-badge" style="background:${type==='series'?'var(--grad1)':'linear-gradient(135deg,var(--blue),#0077a8)'}"></div>
+          <div><div class="section-title">${type==='series'?'Series Anime':'Películas Anime'}</div><div class="section-subtitle">${items.length} títulos disponibles</div></div>
+        </div>
+      </div>
+      ${items.length?`<div class="poster-row">${renderPosterCards(items)}</div>`:`<div class="empty"><div class="empty-ico">🎌</div>No hay ${type==='series'?'series':'películas'} todavía.</div>`}
+    </div>
+  </div>`;
+}
+
+// ─── SEARCH PAGE ────────────────────────────
+function renderSearchPage(){
+  const results=API.search(S.searchQ);
+  return`<div class="search-page">
+    <div class="search-title">Resultados de búsqueda</div>
+    <div class="search-sub">${results.length} resultado${results.length!==1?'s':''} para "<strong>${S.searchQ}</strong>"</div>
+    ${results.length?`<div class="poster-row">${renderPosterCards(results)}</div>`:`<div class="empty"><div class="empty-ico">🔍</div>No se encontró ningún anime con ese nombre.</div>`}
+  </div>`;
+}
+
+// ─── DETAIL PAGE ────────────────────────────
+function renderDetail(){
+  const a=API.byId(S.animeId);
+  if(!a)return`<div style="margin-top:100px;padding:48px;text-align:center;color:var(--text3)">Anime no encontrado. <button class="btn btn-outline btn-sm" onclick="nav('home')">Inicio</button></div>`;
+  const eps=a.eps||[];
+  return`<div>
+    <div class="detail-hero">
+      <div class="detail-hero-bg" style="background-image:url('${img(a.banner||a.poster)}')"></div>
+      <div class="detail-hero-overlay"></div>
+    </div>
+    <div class="detail-body">
+      <button class="back-btn" onclick="history.go(-1)||nav('home')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m15 18-6-6 6-6"/></svg>
+        Atrás
+      </button>
+      <div class="detail-grid">
+        <div>
+          <img class="detail-poster" src="${img(a.poster)}" loading="lazy">
+          ${eps.length?`<button class="btn btn-accent" style="width:100%;margin-top:14px;justify-content:center" onclick="nav('player',{animeId:${a.id},epNum:1})">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg>
+            Reproducir EP 1
+          </button>`:''}
+        </div>
+        <div>
+          <div class="detail-title">${a.title}</div>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:14px">
+            ${a.year?`<span class="tag tag-gold">${a.year}</span>`:''}
+            <span class="tag ${a.type==='movie'?'tag-blue':'tag-red'}">${a.type==='movie'?'Película':'Serie'}</span>
+            ${eps.length?`<span class="tag tag-gray">${eps.length} episodio${eps.length!==1?'s':''}</span>`:''}
+          </div>
+          <div class="genres-wrap">${(a.genres||[]).map(g=>`<span class="tag tag-gray">${g}</span>`).join('')}</div>
+          <div class="detail-synopsis">${a.synopsis||'Sin sinopsis disponible.'}</div>
+          ${eps.length?`
+            <div style="border-top:1px solid var(--border);padding-top:20px;margin-top:4px">
+              <div style="font-family:'Bebas Neue';font-size:20px;letter-spacing:.06em;margin-bottom:14px;color:var(--text2)">EPISODIOS</div>
+              <div class="ep-grid">
+                ${eps.map(ep=>`<div class="ep-row" onclick="nav('player',{animeId:${a.id},epNum:${ep.n}})">
+                  <div class="ep-num">${ep.n}</div>
+                  <div class="ep-details">
+                    <div class="ep-title">${ep.title||'Episodio '+ep.n}</div>
+                    <div class="ep-desc-text">${ep.desc||'Sin descripción'}</div>
+                  </div>
+                  <div class="ep-play-btn">▶</div>
+                </div>`).join('')}
+              </div>
+            </div>`:`<div class="empty" style="text-align:left;padding:20px 0"><div class="empty-ico" style="font-size:28px">📭</div>Sin episodios aún.</div>`}
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
+// ─── PLAYER ─────────────────────────────────
+function renderPlayer(){
+  const a=API.byId(S.animeId);const epN=S.epNum||1;
+  if(!a)return`<div style="margin-top:100px;padding:40px;text-align:center">No encontrado.</div>`;
+  const eps=a.eps||[];const ep=eps.find(e=>e.n==epN)||eps[0];
+  if(!ep)return`<div style="margin-top:100px;padding:40px;text-align:center">Episodio no disponible.</div>`;
+  const w=DB.watched();w[a.id]={aid:a.id,ep:epN,time:Date.now()};DB.saveWatched(w);
+  const prev=eps.find(e=>e.n==epN-1);const next=eps.find(e=>e.n==epN+1);
+  return`<div class="player-container">
+    <div class="player-frame">
+      <iframe src="${ep.embed||'about:blank'}" allowfullscreen allow="autoplay;fullscreen;encrypted-media"></iframe>
+    </div>
+    <div class="player-info">
+      <button class="back-btn" onclick="nav('detail',{animeId:${a.id}})">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m15 18-6-6 6-6"/></svg>
+        ${a.title}
+      </button>
+      <div class="player-title">${a.title}</div>
+      <div style="font-size:14px;color:var(--text2);margin:6px 0 16px">Episodio ${epN}${ep.title?' — '+ep.title:''}</div>
+      <div class="player-ep-nav">
+        ${prev?`<button class="btn btn-glass btn-sm" onclick="nav('player',{animeId:${a.id},epNum:${prev.n}})">← EP ${prev.n}</button>`:''}
+        ${next?`<button class="btn btn-accent btn-sm" onclick="nav('player',{animeId:${a.id},epNum:${next.n}})">EP ${next.n} →</button>`:''}
+      </div>
+      ${ep.desc?`<div style="font-size:13px;color:var(--text2);margin-top:14px;max-width:680px;line-height:1.7">${ep.desc}</div>`:''}
+    </div>
+  </div>`;
+}
+
+// ═══════════════════════════════════════════
+//  AUTH
+// ═══════════════════════════════════════════
+function renderAuth(){
+  return`<div class="auth-page">
+    <div class="auth-box">
+      <div class="auth-logo">ANIVAULT</div>
+      <div class="auth-tagline">Panel de Administración</div>
+      <div class="auth-tab-row">
+        <button class="auth-tab active" id="tab-in" onclick="switchTab('in')">Ingresar</button>
+        <button class="auth-tab" id="tab-reg" onclick="switchTab('reg')">Registro</button>
+      </div>
+      <div id="pane-in">
+        <div class="form-row"><label>Email</label><input id="in-email" type="email" placeholder="tu@email.com"></div>
+        <div class="form-row"><label>Contraseña</label><input id="in-pass" type="password" placeholder="••••••••"></div>
+        <button class="btn btn-accent" style="width:100%;justify-content:center;margin-top:4px" onclick="doLogin()">Ingresar</button>
+      </div>
+      <div id="pane-reg" style="display:none">
+        <div class="form-row"><label>Nombre de usuario</label><input id="rn" placeholder="Username"></div>
+        <div class="form-row"><label>Email</label><input id="re" type="email" placeholder="tu@email.com"></div>
+        <div class="form-row"><label>Contraseña</label><input id="rp" type="password" placeholder="Mínimo 6 caracteres"></div>
+        <button class="btn btn-accent" style="width:100%;justify-content:center;margin-top:4px" onclick="doReg()">Crear Cuenta</button>
+      </div>
+      <div style="margin-top:20px;text-align:center"><button class="btn btn-outline btn-sm" onclick="nav('home')">← Volver al sitio</button></div>
+    </div>
+  </div>`;
+}
+function switchTab(t){
+  document.getElementById('tab-in').classList.toggle('active',t==='in');
+  document.getElementById('tab-reg').classList.toggle('active',t==='reg');
+  document.getElementById('pane-in').style.display=t==='in'?'':'none';
+  document.getElementById('pane-reg').style.display=t==='reg'?'':'none';
+}
+function doLogin(){
+  const e=document.getElementById('in-email')?.value||'';
+  const p=document.getElementById('in-pass')?.value||'';
+  const u=DB.users().find(x=>x.email===e&&x.password===p);
+  if(!u){toast('Credenciales incorrectas','err');return;}
+  S.user=u;S.page='admin-secret';render();toast('Bienvenido, '+u.username,'ok');
+}
+function doReg(){
+  const n=document.getElementById('rn')?.value?.trim()||'';
+  const e=document.getElementById('re')?.value?.trim()||'';
+  const p=document.getElementById('rp')?.value||'';
+  if(!n||!e||!p){toast('Completa todos los campos','err');return;}
+  if(p.length<6){toast('Contraseña muy corta','err');return;}
+  const users=DB.users();
+  if(users.find(u=>u.email===e)){toast('Email ya registrado','err');return;}
+  const nu={id:'u'+Date.now(),username:n,email:e,password:p,role:'user',created:Date.now()};
+  users.push(nu);DB.saveUsers(users);S.user=nu;S.page='admin-secret';render();toast('Cuenta creada!','ok');
+}
+
+// ═══════════════════════════════════════════
+//  ADMIN
+// ═══════════════════════════════════════════
+function renderAdmin(){
+  const u=S.user;
+  const menu=[
+    {id:'dashboard',ico:'◈',label:'Dashboard'},
+    {id:'my-anime',ico:'⬡',label:'Mi Anime'},
+    {id:'tmdb',ico:'⊕',label:'TMDb Import'},
+    {id:'episodes',ico:'▤',label:'Episodios'},
+    {id:'codes',ico:'⌨',label:'Códigos'},
+    {id:'settings',ico:'◎',label:'Ajustes'},
+  ];
+  if(u?.role==='admin')menu.splice(3,0,{id:'all-anime',ico:'⬢',label:'Todo el Anime'});
+  return`<div class="admin-wrap">
+    <div class="admin-sidebar">
+      <div class="admin-logo-bar">
+        <div class="admin-logo-text">ANIVAULT</div>
+        <div class="admin-logo-sub">Admin Panel</div>
+      </div>
+      <div class="admin-user-bar">
+        <div class="admin-user-name">${u?.username}</div>
+        <div class="admin-user-role">${u?.role==='admin'?'Administrador':'Editor'}</div>
+      </div>
+      <div class="sidebar-nav">
+        <div class="s-label">Menú</div>
+        ${menu.map(m=>`<div class="s-item ${S.admin===m.id?'active':''}" onclick="setAdmin('${m.id}')">${m.ico} ${m.label}</div>`).join('')}
+        <div class="s-sep"></div>
+        <div class="s-item" onclick="nav('home')">↗ Ver Sitio</div>
+        <div class="s-item" onclick="logout()">⎋ Cerrar Sesión</div>
+      </div>
+    </div>
+    <div class="admin-main">
+      <div class="admin-bar">
+        <div style="font-family:'Bebas Neue';font-size:18px;letter-spacing:.06em">${menu.find(m=>m.id===S.admin)?.label||'Dashboard'}</div>
+        <div style="font-size:12px;color:var(--text3)">${u?.email}</div>
+      </div>
+      <div class="admin-page-wrap" id="admin-content">${renderAdminPage()}</div>
+    </div>
+  </div>
+  ${renderModals()}`;
+}
+
+function renderAdminPage(){
+  if(S.admin==='dashboard')return renderDash();
+  if(S.admin==='my-anime')return renderMyAnime();
+  if(S.admin==='all-anime')return renderAllAnime();
+  if(S.admin==='tmdb')return renderTmdb();
+  if(S.admin==='episodes')return renderEps();
+  if(S.admin==='codes')return renderCodes();
+  if(S.admin==='settings')return renderSettings();
+  return renderDash();
+}
+
+// ─── DASHBOARD ──────────────────────────────
+function renderDash(){
+  const u=S.user;const mine=API.userAnime(u?.id);const eps=mine.reduce((s,a)=>s+(a.eps?.length||0),0);
+  const recent=mine.sort((a,b)=>b.createdAt-a.createdAt).slice(0,5);
+  return`<div>
+    <div class="stats-row">
+      <div class="stat-box"><div class="stat-n">${mine.length}</div><div class="stat-l">Mi Anime</div></div>
+      <div class="stat-box"><div class="stat-n">${eps}</div><div class="stat-l">Episodios</div></div>
+      <div class="stat-box"><div class="stat-n">${mine.filter(a=>a.vis==='public').length}</div><div class="stat-l">Públicos</div></div>
+      <div class="stat-box"><div class="stat-n">${mine.filter(a=>a.type==='movie').length}</div><div class="stat-l">Películas</div></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+      <div class="card" style="background:#0c0c20;border:1px solid #111130;border-radius:12px;padding:18px">
+        <div style="font-family:'Bebas Neue';font-size:16px;margin-bottom:14px;color:var(--text3);letter-spacing:.08em">RECIENTES</div>
+        ${recent.length?recent.map(a=>`<div style="display:flex;gap:12px;align-items:center;padding:9px 0;border-bottom:1px solid #0f0f28">
+          <img src="${img(a.poster)}" style="width:38px;height:54px;object-fit:cover;border-radius:5px;flex-shrink:0">
+          <div style="flex:1;min-width:0">
+            <div style="font-size:13px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${a.title}</div>
+            <div style="font-size:11px;color:var(--text3);margin-top:2px">${a.eps?.length||0} eps · <span class="${vcls(a.vis)}">${a.vis}</span></div>
+          </div>
+        </div>`).join(''):`<div class="empty" style="padding:20px 0"><div class="empty-ico" style="font-size:28px">🎌</div>Importa desde TMDb.</div>`}
+      </div>
+      <div class="card" style="background:#0c0c20;border:1px solid #111130;border-radius:12px;padding:18px">
+        <div style="font-family:'Bebas Neue';font-size:16px;margin-bottom:14px;color:var(--text3);letter-spacing:.08em">ACCIONES RÁPIDAS</div>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <button class="btn btn-accent" onclick="setAdmin('tmdb')">⊕ Importar desde TMDb</button>
+          <button class="btn btn-outline" onclick="setAdmin('my-anime')">⬡ Mi Anime</button>
+          <button class="btn btn-outline" onclick="setAdmin('episodes')">▤ Gestionar Episodios</button>
+          <button class="btn btn-outline" onclick="setAdmin('codes')">⌨ Ver Códigos</button>
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
+// ─── MY ANIME ───────────────────────────────
+function renderMyAnime(){
+  const items=API.userAnime(S.user?.id);
+  return`<div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px">
+      <div style="font-size:13px;color:var(--text3)">${items.length} títulos en tu biblioteca</div>
+      <button class="btn btn-accent btn-sm" onclick="setAdmin('tmdb')">+ Importar</button>
+    </div>
+    ${items.length?`<div style="overflow-x:auto"><table class="dtable">
+      <thead><tr><th></th><th>Título</th><th>Tipo</th><th>Eps</th><th>Estado</th><th>Acciones</th></tr></thead>
+      <tbody>${items.map(a=>`<tr>
+        <td><img src="${img(a.poster)}" style="width:34px;height:48px;object-fit:cover;border-radius:5px"></td>
+        <td style="font-weight:600;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${a.title}</td>
+        <td><span class="tag ${a.type==='movie'?'tag-blue':'tag-red'}">${a.type}</span></td>
+        <td style="color:var(--text2)">${a.eps?.length||0}</td>
+        <td><span class="${vcls(a.vis)}">${a.vis}</span></td>
+        <td><div style="display:flex;gap:5px;flex-wrap:wrap">
+          <button class="btn btn-outline btn-xs" onclick="openEpModal(${a.id})">Eps</button>
+          <button class="btn btn-outline btn-xs" onclick="openBulk(${a.id})">Bulk</button>
+          <select style="font-size:11px;padding:3px 7px;width:auto" onchange="setVis(${a.id},this.value)">
+            <option value="public" ${a.vis==='public'?'selected':''}>Public</option>
+            <option value="hidden" ${a.vis==='hidden'?'selected':''}>Hidden</option>
+            <option value="private" ${a.vis==='private'?'selected':''}>Private</option>
+          </select>
+          <button class="btn btn-xs" style="background:rgba(230,57,70,.15);color:#ff7b87;border:none" onclick="delAnime(${a.id})">✕</button>
+        </div></td>
+      </tr>`).join('')}</tbody>
+    </table></div>`:`<div class="empty"><div class="empty-ico">🎌</div>Sin anime. Ve a TMDb Import.</div>`}
+  </div>`;
+}
+
+// ─── ALL ANIME ──────────────────────────────
+function renderAllAnime(){
+  const items=DB.anime();const users=DB.users();
+  return`<div>
+    <div style="font-size:13px;color:var(--text3);margin-bottom:16px">${items.length} títulos en el sistema</div>
+    <div style="overflow-x:auto"><table class="dtable">
+      <thead><tr><th>Título</th><th>Dueño</th><th>Tipo</th><th>Eps</th><th>Estado</th><th></th></tr></thead>
+      <tbody>${items.map(a=>{const owner=users.find(u=>u.id===a.uid);return`<tr>
+        <td style="font-weight:600">${a.title}</td>
+        <td style="font-size:12px;color:var(--text3)">${owner?.username||'?'}</td>
+        <td><span class="tag ${a.type==='movie'?'tag-blue':'tag-red'}">${a.type}</span></td>
+        <td style="color:var(--text2)">${a.eps?.length||0}</td>
+        <td><span class="${vcls(a.vis)}">${a.vis}</span></td>
+        <td><button class="btn btn-xs" style="background:rgba(230,57,70,.15);color:#ff7b87;border:none" onclick="delAnime(${a.id})">✕</button></td>
+      </tr>`;}).join('')}</tbody>
+    </table></div>
+  </div>`;
+}
+
+// ─── TMDB SEARCH ────────────────────────────
+function renderTmdb(){
+  return`<div>
+    <div style="background:#0c0c20;border:1px solid #111130;border-radius:12px;padding:18px;margin-bottom:18px">
+      <div style="font-size:13px;color:var(--text3);margin-bottom:14px">Busca anime en TMDb e impórtalo a tu biblioteca con un clic.</div>
+      <div style="display:flex;gap:8px;margin-bottom:10px">
+        <input id="tq" placeholder="Nombre del anime..." value="${S.tmdbQ}" style="flex:1" onkeydown="if(event.key==='Enter')doTmSearch()">
+        <button class="btn btn-accent" onclick="doTmSearch()">Buscar</button>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn btn-outline btn-sm" onclick="doDiscover('tv')">🔥 Series Populares</button>
+        <button class="btn btn-outline btn-sm" onclick="doDiscover('movie')">🎬 Películas Populares</button>
+      </div>
+    </div>
+    ${S.tmdbLoading?`<div class="loading-row"><div class="spinner"></div> Buscando en TMDb...</div>`:''}
+    ${S.tmdbResults.length?`
+      <div style="font-size:12px;color:var(--text3);margin-bottom:10px">${S.tmdbResults.length} resultados — clic para importar</div>
+      <div class="tmdb-grid">${S.tmdbResults.map(r=>{
+        const t=r.name||r.title||'?';
+        const y=(r.first_air_date||r.release_date||'').slice(0,4);
+        const type=r.media_type==='movie'?'movie':'series';
+        const st=t.replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/"/g,'\\"');
+        const so=(r.overview||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/"/g,'\\"').slice(0,300);
+        return`<div class="tmdb-card" onclick="doImport({id:${r.id},title:'${st}',year:'${y}',poster:'${r.poster_path||''}',type:'${type}',ov:'${so}'})" title="${t}">
+          <img class="tmdb-card-img" src="${img(r.poster_path)}" loading="lazy">
+          <div class="tmdb-hover">+ Importar</div>
+          <div class="tmdb-card-info">
+            <div class="tmdb-card-title">${t}</div>
+            <div class="tmdb-card-year">${y} · ${type}</div>
+          </div>
+        </div>`;
+      }).join('')}</div>`:''}
+  </div>`;
+}
+async function doTmSearch(){
+  const q=document.getElementById('tq')?.value||S.tmdbQ;
+  if(!q.trim()){toast('Escribe un título','err');return;}
+  S.tmdbQ=q;S.tmdbLoading=true;refreshAdmin();
+  S.tmdbResults=await tmSearch(q);S.tmdbLoading=false;refreshAdmin();
+}
+async function doDiscover(type){
+  S.tmdbLoading=true;refreshAdmin();
+  const res=await tmDiscover(type);
+  S.tmdbResults=res.map(r=>({...r,media_type:type}));S.tmdbLoading=false;refreshAdmin();
+}
+async function doImport(data){
+  const u=S.user;const all=DB.anime();
+  if(all.find(a=>a.tmdbId==data.id&&a.uid===u?.id)){toast('Ya está en tu biblioteca','err');return;}
+  const detail=await tmDetail(data.id,data.type);
+  const newA={
+    id:gid(),tmdbId:data.id,title:data.title,
+    synopsis:detail?.overview||data.ov||'',
+    poster:data.poster,
+    banner:detail?.backdrop_path||'',
+    genres:(detail?.genres||[]).map(g=>g.name),
+    year:data.year,type:data.type,
+    vis:'public',uid:u?.id,eps:[],createdAt:Date.now()
+  };
+  all.push(newA);DB.saveAnime(all);toast('Importado: '+data.title,'ok');refreshAdmin();
+}
+
+// ─── EPISODES ───────────────────────────────
+function renderEps(){
+  const mine=API.userAnime(S.user?.id);const selId=S.epAnimeId;const sel=selId?mine.find(a=>a.id==selId):null;
+  return`<div>
+    <div style="margin-bottom:18px">
+      <label>Seleccionar Anime</label>
+      <select onchange="S.epAnimeId=parseInt(this.value)||this.value;refreshAdmin()">
+        <option value="">-- Selecciona --</option>
+        ${mine.map(a=>`<option value="${a.id}" ${selId==a.id?'selected':''}>${a.title}</option>`).join('')}
+      </select>
+    </div>
+    ${sel?`<div style="background:#0c0c20;border:1px solid #111130;border-radius:12px;padding:18px">
+      <div style="display:flex;gap:14px;align-items:center;margin-bottom:18px">
+        <img src="${img(sel.poster)}" style="width:50px;height:70px;object-fit:cover;border-radius:7px">
+        <div style="flex:1">
+          <div style="font-weight:700;font-size:15px">${sel.title}</div>
+          <div style="font-size:12px;color:var(--text3);margin-top:3px">${sel.eps?.length||0} episodios</div>
+        </div>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-accent btn-sm" onclick="openEpModal(${sel.id})">+ Agregar</button>
+          <button class="btn btn-outline btn-sm" onclick="openBulk(${sel.id})">Bulk</button>
+        </div>
+      </div>
+      ${(sel.eps||[]).length?`<div style="display:flex;flex-direction:column;gap:8px;max-height:480px;overflow-y:auto">
+        ${(sel.eps||[]).map(ep=>`<div style="display:flex;align-items:center;gap:12px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:12px 14px">
+          <div style="font-family:'Bebas Neue';font-size:22px;color:var(--accent);min-width:36px">${ep.n}</div>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:13px;font-weight:600">${ep.title||'Episodio '+ep.n}</div>
+            <div style="font-size:11px;color:var(--text3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${ep.embed||'Sin enlace'}</div>
+          </div>
+          <div style="display:flex;gap:6px">
+            <button class="btn btn-outline btn-xs" onclick="editEp(${sel.id},${ep.n})">Editar</button>
+            <button class="btn btn-xs" style="background:rgba(230,57,70,.15);color:#ff7b87;border:none" onclick="delEp(${sel.id},${ep.n})">✕</button>
+          </div>
+        </div>`).join('')}
+      </div>`:`<div class="empty" style="padding:20px 0"><div class="empty-ico" style="font-size:28px">📭</div>Sin episodios.</div>`}
+    </div>`:''}
+  </div>`;
+}
+
+// ─── SETTINGS ───────────────────────────────
+function renderSettings(){
+  const u=S.user;const users=DB.users();
+  return`<div>
+    <div style="background:#0c0c20;border:1px solid #111130;border-radius:12px;padding:18px;margin-bottom:16px">
+      <div style="font-family:'Bebas Neue';font-size:18px;margin-bottom:4px;letter-spacing:.06em">CUENTA</div>
+      <div style="font-size:13px;margin-bottom:4px;margin-top:10px"><span style="color:var(--text2)">Usuario:</span> <strong>${u?.username}</strong></div>
+      <div style="font-size:13px;margin-bottom:4px"><span style="color:var(--text2)">Email:</span> ${u?.email}</div>
+      <div style="font-size:13px"><span style="color:var(--text2)">Rol:</span> <span class="tag tag-${u?.role==='admin'?'red':'blue'}">${u?.role}</span></div>
+    </div>
+    <div style="background:#0c0c20;border:1px solid #111130;border-radius:12px;padding:18px;margin-bottom:16px">
+      <div style="font-family:'Bebas Neue';font-size:18px;margin-bottom:4px;letter-spacing:.06em">URL SECRETA DEL ADMIN</div>
+      <div style="font-size:12px;color:var(--text3);margin:10px 0">No compartas esta URL. Es la única forma de acceder al panel.</div>
+      <div style="background:var(--bg);border:1px solid #1a1a35;border-radius:8px;padding:12px 14px;font-family:'JetBrains Mono';font-size:13px;color:var(--accent);word-break:break-all">${window.location.origin}#${SECRET_PATH}</div>
+    </div>
+    ${u?.role==='admin'?`<div style="background:#0c0c20;border:1px solid #111130;border-radius:12px;padding:18px">
+      <div style="font-family:'Bebas Neue';font-size:18px;margin-bottom:14px;letter-spacing:.06em">USUARIOS REGISTRADOS</div>
+      <table class="dtable"><thead><tr><th>Usuario</th><th>Email</th><th>Rol</th><th>Anime</th></tr></thead>
+      <tbody>${users.map(x=>`<tr>
+        <td style="font-weight:600">${x.username}</td>
+        <td style="font-size:12px;color:var(--text3)">${x.email}</td>
+        <td><span class="tag tag-${x.role==='admin'?'red':'blue'}">${x.role}</span></td>
+        <td style="color:var(--text2)">${DB.anime().filter(a=>a.uid===x.id).length}</td>
+      </tr>`).join('')}</tbody></table>
+    </div>`:''}`
+}
+
+// ─── CÓDIGOS ────────────────────────────────
+const CS={api:'API Code',home:'Home HTML',series:'Series HTML',movies:'Movies HTML','anime-page':'Anime Detail HTML',player:'Player HTML'};
+const CC={
+api:`// AniVault — Internal API Reference
+// Base URL: /api
+
+// GET /api/anime — todos los anime públicos
+fetch("/api/anime")
+  .then(r => r.json())
+  .then(data => console.log(data));
+
+// GET /api/anime/:id — detalle de un anime
+fetch("/api/anime/101")
+  .then(r => r.json())
+  .then(a => console.log(a.title, a.episodes));
+
+// GET /api/anime/:id/episodes — lista de episodios
+fetch("/api/anime/101/episodes")
+  .then(r => r.json())
+  .then(eps => eps.forEach(e => console.log(e.embed)));
+
+// GET /api/user/:uid/anime — anime por usuario
+fetch("/api/user/owner/anime")
+  .then(r => r.json())
+  .then(data => console.log(data));
+
+// Respuesta ejemplo — /api/anime/:id
+/*
+{
+  "id": 101,
+  "tmdbId": 1429,
+  "title": "Attack on Titan",
+  "poster": "https://image.tmdb.org/t/p/original/...",
+  "banner": "https://image.tmdb.org/t/p/original/...",
+  "synopsis": "...",
+  "genres": ["Action", "Fantasy", "Drama"],
+  "year": "2013",
+  "type": "series",
+  "visibility": "public",
+  "episodes": [
+    {
+      "n": 1,
+      "title": "To You, in 2000 Years",
+      "desc": "...",
+      "embed": "https://embed.example.com/ep1"
+    }
+  ]
+}
+*/`,
+home:`<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>AniVault</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <!-- Navbar -->
+  <nav id="nav">
+    <a href="/" class="logo">ANIVAULT</a>
+    <a href="/series.html">Series</a>
+    <a href="/movies.html">Películas</a>
+    <input id="search" placeholder="Buscar..."
+      onkeydown="if(event.key==='Enter')
+        location.href='/search.html?q='+this.value">
+  </nav>
+
+  <!-- Hero Slider -->
+  <section id="hero"></section>
+
+  <!-- Secciones -->
+  <section id="airing">
+    <h2>En Emisión</h2>
+    <div id="airing-grid"></div>
+  </section>
+
+  <section id="catalog">
+    <h2>Catálogo</h2>
+    <div id="catalog-grid"></div>
+  </section>
+
+  <script>
+    // Carga desde la API interna
+    fetch("/api/anime")
+      .then(r => r.json())
+      .then(data => {
+        buildHero(data.slice(0, 5));
+        buildGrid("airing-grid",
+          data.filter(a => a.type === "series").slice(0,8));
+        buildGrid("catalog-grid", data);
+        startSlider(5500);
+      });
+
+    function buildHero(items) {
+      document.getElementById("hero").innerHTML =
+        items.map((a, i) =>
+          '<div class="slide' + (i===0?' active':'') + '">' +
+          '<div class="bg" style="background-image:url('+a.poster+')"></div>'+
+          '<div class="content">' +
+          '<h1>' + a.title + '</h1>' +
+          '<p>' + a.synopsis + '</p>' +
+          '<a href="/anime.html?id=' + a.id + '">Ver Ahora</a>' +
+          '</div></div>'
+        ).join("");
+    }
+
+    function buildGrid(id, items) {
+      document.getElementById(id).innerHTML =
+        items.map(a =>
+          '<a href="/anime.html?id=' + a.id + '" class="card">' +
+          '<img src="' + a.poster + '" loading="lazy">' +
+          '<div>' + a.title + '</div>' +
+          '</a>'
+        ).join("");
+    }
+
+    let idx = 0;
+    function startSlider(ms) {
+      setInterval(() => {
+        const s = document.querySelectorAll(".slide");
+        s[idx].classList.remove("active");
+        idx = (idx + 1) % s.length;
+        s[idx].classList.add("active");
+      }, ms);
+    }
+  <\/script>
+</body>
+</html>`,
+series:`<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>AniVault - Series</title>
+</head>
+<body>
+  <nav id="nav">
+    <a href="/" class="logo">ANIVAULT</a>
+    <a href="/series.html" class="active">Series</a>
+    <a href="/movies.html">Películas</a>
+  </nav>
+
+  <main>
+    <h1>Series Anime</h1>
+    <div id="filter-bar"></div>
+    <div id="grid" class="anime-grid"></div>
+  </main>
+
+  <script>
+    // Carga series desde la API interna
+    fetch("/api/anime")
+      .then(r => r.json())
+      .then(data => {
+        const series = data.filter(a => a.type === "series");
+        render(series);
+        buildFilter(series);
+      });
+
+    function render(items) {
+      document.getElementById("grid").innerHTML =
+        items.map(a =>
+          '<a href="/anime.html?id=' + a.id + '" class="card">' +
+          '<img src="' + a.poster + '" loading="lazy">' +
+          '<div class="title">' + a.title + '</div>' +
+          '<div class="meta">' + a.episodes.length + ' eps</div>' +
+          '</a>'
+        ).join("");
+    }
+
+    function buildFilter(items) {
+      const genres = [...new Set(items.flatMap(a => a.genres))];
+      document.getElementById("filter-bar").innerHTML =
+        ["Todos", ...genres].map(g =>
+          '<button onclick="filter(\'' + g + '\')">' + g + '</button>'
+        ).join("");
+    }
+
+    function filter(genre) {
+      fetch("/api/anime")
+        .then(r => r.json())
+        .then(data => {
+          let s = data.filter(a => a.type === "series");
+          if (genre !== "Todos")
+            s = s.filter(a => a.genres.includes(genre));
+          render(s);
+        });
+    }
+  <\/script>
+</body>
+</html>`,
+movies:`<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>AniVault - Películas</title>
+</head>
+<body>
+  <nav id="nav">
+    <a href="/" class="logo">ANIVAULT</a>
+    <a href="/series.html">Series</a>
+    <a href="/movies.html" class="active">Películas</a>
+  </nav>
+
+  <main>
+    <h1>Películas Anime</h1>
+    <div id="grid" class="anime-grid"></div>
+  </main>
+
+  <script>
+    // Carga películas desde la API interna
+    fetch("/api/anime")
+      .then(r => r.json())
+      .then(data => {
+        const movies = data.filter(a => a.type === "movie");
+        document.getElementById("grid").innerHTML =
+          movies.map(a =>
+            '<a href="/anime.html?id=' + a.id + '" class="card">' +
+            '<img src="' + a.poster + '" loading="lazy">' +
+            '<span class="tag">Película</span>' +
+            '<div class="title">' + a.title + '</div>' +
+            '<div class="meta">' + a.year + '</div>' +
+            '</a>'
+          ).join("");
+      });
+  <\/script>
+</body>
+</html>`,
+'anime-page':`<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>AniVault - Anime</title>
+</head>
+<body>
+  <nav id="nav"><a href="/" class="logo">ANIVAULT</a></nav>
+  <div id="detail"></div>
+
+  <script>
+    const id = new URLSearchParams(location.search).get("id");
+
+    // Carga detalle desde la API interna
+    fetch("/api/anime/" + id)
+      .then(r => r.json())
+      .then(a => {
+        document.title = "AniVault - " + a.title;
+        document.getElementById("detail").innerHTML =
+          '<div class="hero" style="background-image:url('+a.banner+')"></div>'+
+          '<div class="body">'+
+            '<img src="'+a.poster+'" class="poster">'+
+            '<h1>'+a.title+'</h1>'+
+            '<div class="genres">'+
+              a.genres.map(g=>'<span>'+g+'</span>').join("")+
+            '</div>'+
+            '<p>'+a.synopsis+'</p>'+
+            '<h2>Episodios</h2>'+
+            '<div class="ep-list">'+
+              a.episodes.map(ep=>
+                '<a href="/player.html?id='+a.id+'&ep='+ep.n+'"'+
+                ' class="ep-row">'+
+                  '<span class="num">'+ep.n+'</span>'+
+                  '<div>'+
+                    '<div>'+(ep.title||"Episodio "+ep.n)+'</div>'+
+                    '<div>'+(ep.desc||"")+'</div>'+
+                  '</div>'+
+                  '<span>▶</span>'+
+                '</a>'
+              ).join("")+
+            '</div>'+
+          '</div>';
+      });
+  <\/script>
+</body>
+</html>`,
+player:`<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>AniVault - Player</title>
+</head>
+<body>
+  <nav id="nav"><a href="/" class="logo">ANIVAULT</a></nav>
+
+  <div id="player-frame"></div>
+  <div id="info"></div>
+  <div id="nav-eps"></div>
+
+  <script>
+    const p = new URLSearchParams(location.search);
+    const id = p.get("id");
+    const ep = parseInt(p.get("ep")) || 1;
+
+    // Carga episodios desde la API interna
+    fetch("/api/anime/" + id + "/episodes")
+      .then(r => r.json())
+      .then(eps => {
+        const e = eps.find(x => x.n === ep);
+        if (!e) return;
+
+        // Embed del video
+        document.getElementById("player-frame").innerHTML =
+          '<iframe src="' + e.embed + '"' +
+          ' allowfullscreen allow="autoplay;fullscreen">' +
+          '</iframe>';
+
+        // Info del episodio
+        document.getElementById("info").innerHTML =
+          '<h2>' + (e.title || "Episodio " + ep) + '</h2>' +
+          '<p>' + (e.desc || "") + '</p>';
+
+        // Navegación prev/next
+        const prev = eps.find(x => x.n === ep - 1);
+        const next = eps.find(x => x.n === ep + 1);
+        document.getElementById("nav-eps").innerHTML =
+          (prev ? '<a href="?id='+id+'&ep='+prev.n+'">← EP '+prev.n+'</a>' : "") +
+          (next ? '<a href="?id='+id+'&ep='+next.n+'">EP '+next.n+' →</a>' : "");
+
+        // Guardar historial
+        const h = JSON.parse(
+          localStorage.getItem("av_watched") || "{}"
+        );
+        h[id] = { aid: id, ep, time: Date.now() };
+        localStorage.setItem("av_watched", JSON.stringify(h));
+      });
+  <\/script>
+</body>
+</html>`};
+
+function renderCodes(){
+  const u=S.user;const isAdmin=u?.role==='admin';const active=S.codesPage||'api';
+  return`<div style="display:flex;gap:16px;height:calc(100vh - 160px)">
+    <div style="width:165px;flex-shrink:0">
+      <div style="font-size:10px;font-weight:700;color:var(--text3);letter-spacing:.12em;text-transform:uppercase;margin-bottom:10px">CÓDIGOS</div>
+      ${Object.entries(CS).map(([id,label])=>`<div class="s-item ${active===id?'active':''}" style="padding:9px 12px;border-radius:8px;margin-bottom:2px;font-size:12px" onclick="S.codesPage='${id}';refreshAdmin()">${label}</div>`).join('')}
+    </div>
+    <div style="flex:1;overflow:hidden;display:flex;flex-direction:column;gap:10px">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div style="font-family:'Bebas Neue';font-size:20px;letter-spacing:.06em">${CS[active]}</div>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-outline btn-sm" onclick="copyCode()">📋 Copiar</button>
+          ${isAdmin?`<button class="btn btn-sm" style="background:rgba(230,57,70,.15);color:#ff7b87;border:1px solid rgba(230,57,70,.2)">✏ Admin Only</button>`:''}
+        </div>
+      </div>
+      <div style="font-size:11px;color:var(--text3);font-family:'JetBrains Mono'">Solo lectura · Código fuente del sistema</div>
+      <div class="code-area" id="code-block"><pre>${hlCode(CC[active]||'')}</pre></div>
+    </div>
+  </div>`;
+}
+function hlCode(c){
+  return c.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/(\/\/[^\n]*)/g,'<span style="color:#585b70">$1</span>')
+    .replace(/\/\*[\s\S]*?\*\//g,m=>`<span style="color:#585b70">${m}</span>`)
+    .replace(/\b(const|let|var|function|return|if|else|forEach|map|filter|then|catch|async|await|new|from|import|export|default)\b/g,'<span style="color:#cba6f7">$1</span>')
+    .replace(/("(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'|`(?:[^`\\]|\\.)*`)/g,'<span style="color:#a6e3a1">$1</span>')
+    .replace(/\b(\d+)\b/g,'<span style="color:#fab387">$1</span>');
+}
+function copyCode(){
+  const pre=document.querySelector('#code-block pre');if(!pre)return;
+  navigator.clipboard.writeText(pre.innerText||'').then(()=>toast('Código copiado','ok')).catch(()=>toast('No se pudo copiar','err'));
+}
+
+// ═══════════════════════════════════════════
+//  MODALS
+// ═══════════════════════════════════════════
+function renderModals(){
+  let h='';
+  if(S.epModal)h+=renderEpModalHTML();
+  if(S.bulkId)h+=renderBulkHTML();
+  return h;
+}
+function renderEpModalHTML(){
+  const {aid,ep}=S.epModal||{};
+  const a=DB.anime().find(x=>x.id==aid);
+  const nextN=(a?.eps?.length||0)+1;
+  return`<div class="modal-bg" onclick="if(event.target===this){S.epModal=null;refreshAdmin()}">
+    <div class="modal-box">
+      <button class="modal-x" onclick="S.epModal=null;refreshAdmin()">✕</button>
+      <div class="modal-title">${ep?'Editar':'Agregar'} Episodio</div>
+      <div style="font-size:13px;color:var(--text3);margin-bottom:16px">${a?.title||''}</div>
+      <div class="form-row"><label>Número</label><input id="en" type="number" value="${ep?ep.n:nextN}"></div>
+      <div class="form-row"><label>Título</label><input id="et" value="${ep?ep.title:''}"></div>
+      <div class="form-row"><label>Descripción</label><textarea id="ed">${ep?ep.desc:''}</textarea></div>
+      <div class="form-row"><label>Embed Link</label><input id="ee" value="${ep?ep.embed:''}" placeholder="https://embed.server.com/video123"></div>
+      <div style="display:flex;gap:10px;margin-top:20px">
+        <button class="btn btn-accent" onclick="saveEp(${aid},${ep?ep.n:'null'})">${ep?'Actualizar':'Agregar'}</button>
+        <button class="btn btn-outline" onclick="S.epModal=null;refreshAdmin()">Cancelar</button>
+      </div>
+    </div>
+  </div>`;
+}
+function renderBulkHTML(){
+  const aid=S.bulkId;const a=DB.anime().find(x=>x.id==aid);
+  return`<div class="modal-bg" onclick="if(event.target===this){S.bulkId=null;refreshAdmin()}">
+    <div class="modal-box">
+      <button class="modal-x" onclick="S.bulkId=null;refreshAdmin()">✕</button>
+      <div class="modal-title">Importar Episodios</div>
+      <div style="font-size:13px;color:var(--text3);margin-bottom:16px">${a?.title||''}</div>
+      <div style="font-size:12px;color:var(--text3);background:var(--bg);border:1px solid #1a1a35;border-radius:8px;padding:12px;margin-bottom:14px;font-family:'JetBrains Mono'">
+        Formato: <span style="color:var(--accent)">NUMERO|URL_EMBED</span><br>
+        Ejemplo:<br>
+        1|https://embed.server.com/ep1<br>
+        2|https://embed.server.com/ep2
+      </div>
+      <div class="form-row"><label>Pegar enlaces</label><textarea id="bulk-inp" style="min-height:180px;font-family:'JetBrains Mono';font-size:12px" placeholder="1|https://...\n2|https://..."></textarea></div>
+      <div style="display:flex;gap:10px;margin-top:20px">
+        <button class="btn btn-accent" onclick="saveBulk(${aid})">Importar Todo</button>
+        <button class="btn btn-outline" onclick="S.bulkId=null;refreshAdmin()">Cancelar</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+// ═══════════════════════════════════════════
+//  ADMIN ACTIONS
+// ═══════════════════════════════════════════
+function openEpModal(aid){S.epModal={aid,ep:null};refreshAdmin();}
+function editEp(aid,n){const a=DB.anime().find(x=>x.id==aid);const ep=a?.eps?.find(e=>e.n==n);S.epModal={aid,ep};refreshAdmin();}
+function openBulk(aid){S.bulkId=aid;refreshAdmin();}
+
+function saveEp(aid,oldN){
+  const n=parseInt(document.getElementById('en')?.value)||1;
+  const t=document.getElementById('et')?.value||'';
+  const d=document.getElementById('ed')?.value||'';
+  const e=document.getElementById('ee')?.value||'';
+  if(!e){toast('El embed es requerido','err');return;}
+  const all=DB.anime();const idx=all.findIndex(a=>a.id==aid);if(idx===-1)return;
+  const eps=all[idx].eps||[];
+  if(oldN&&oldN!=='null'){const i=eps.findIndex(e=>e.n==oldN);if(i>-1)eps[i]={n,title:t,desc:d,embed:e};else eps.push({n,title:t,desc:d,embed:e});}
+  else{if(eps.find(e=>e.n==n)){toast('Número ya existe','err');return;}eps.push({n,title:t,desc:d,embed:e});eps.sort((a,b)=>a.n-b.n);}
+  all[idx].eps=eps;DB.saveAnime(all);S.epModal=null;toast('Episodio guardado','ok');refreshAdmin();
+}
+
+function saveBulk(aid){
+  const raw=document.getElementById('bulk-inp')?.value||'';
+  const all=DB.anime();const idx=all.findIndex(a=>a.id==aid);if(idx===-1)return;
+  const eps=all[idx].eps||[];let count=0;
+  raw.split('\n').filter(l=>l.trim()).forEach(line=>{
+    const parts=line.trim().split('|');
+    if(parts.length>=2){const n=parseInt(parts[0]);const embed=parts.slice(1).join('|').trim();
+      if(!isNaN(n)&&embed&&!eps.find(e=>e.n==n)){eps.push({n,title:'Episodio '+n,desc:'',embed});count++;}}
+  });
+  eps.sort((a,b)=>a.n-b.n);all[idx].eps=eps;DB.saveAnime(all);
+  S.bulkId=null;toast(count+' episodios importados','ok');refreshAdmin();
+}
+
+function delEp(aid,n){if(!confirm('¿Eliminar episodio '+n+'?'))return;
+  const all=DB.anime();const idx=all.findIndex(a=>a.id==aid);if(idx===-1)return;
+  all[idx].eps=(all[idx].eps||[]).filter(e=>e.n!=n);DB.saveAnime(all);toast('Eliminado','inf');refreshAdmin();}
+
+function delAnime(id){if(!confirm('¿Eliminar este anime y todos sus episodios?'))return;
+  DB.saveAnime(DB.anime().filter(a=>a.id!=id));toast('Anime eliminado','inf');refreshAdmin();}
+
+function setVis(id,vis){const all=DB.anime();const i=all.findIndex(a=>a.id==id);
+  if(i>-1){all[i].vis=vis;DB.saveAnime(all);toast('Visibilidad: '+vis,'ok');}}
+
+function setAdmin(p){S.admin=p;S.tmdbResults=[];render();}
+
+function refreshAdmin(){
+  const c=document.getElementById('admin-content');if(c)c.innerHTML=renderAdminPage();
+  const app=document.getElementById('app');if(!app)return;
+  document.querySelectorAll('.modal-bg').forEach(m=>m.remove());
+  if(S.epModal||S.bulkId){const d=document.createElement('div');d.innerHTML=renderModals();while(d.firstChild)app.appendChild(d.firstChild);}
+}
+
+function heroGo(i){
+  S.heroIdx=i;
+  document.querySelectorAll('.hero-slide').forEach((s,idx)=>s.classList.toggle('active',idx===i));
+  document.querySelectorAll('.hero-dot').forEach((d,idx)=>d.classList.toggle('active',idx===i));
+  const numEl=document.getElementById('hero-num');if(numEl)numEl.textContent=String(i+1).padStart(2,'0')+' / '+String(S.heroCount).padStart(2,'0');
+  if(heroT){clearInterval(heroT);heroT=null;}startHero(S.heroCount);
+}
+
+// ═══════════════════════════════════════════
+//  HASH ROUTING (URL secreta)
+// ═══════════════════════════════════════════
+function handleHash(){
+  const hash=location.hash.replace('#','');
+  if(hash===SECRET_PATH){S.page='admin-secret';render();}
+}
+window.addEventListener('hashchange',handleHash);
+
+// ═══════════════════════════════════════════
+//  SEED DATA & INIT
+// ═══════════════════════════════════════════
+function init(){
+  if(DB.anime().length===0){
+    const demo=[
+      {id:1001,tmdbId:1429,title:"Attack on Titan",synopsis:"La humanidad vive dentro de ciudades rodeadas de enormes muros que las protegen de los Titanes, humanoides gigantes que devoran personas sin ningún motivo aparente.",poster:"/xf9wuDcqlUPWABZNeDKakN9MdEZ.jpg",banner:"/nGIJPLG0ZRxU5G4bPVIxVl0aXUG.jpg",genres:["Acción","Fantasía","Drama"],year:"2013",type:"series",vis:"public",uid:"owner",eps:[{n:1,title:"A Ti, en 2000 Años",desc:"El muro exterior cae y los Titanes invaden la ciudad.",embed:"https://www.youtube.com/embed/MGRm4IzK1SQ"},{n:2,title:"Ese Día",desc:"Los sobrevivientes intentan recuperarse del ataque.",embed:"https://www.youtube.com/embed/MGRm4IzK1SQ"}],createdAt:Date.now()-86400000*3},
+      {id:1002,tmdbId:46298,title:"Demon Slayer",synopsis:"Un joven se convierte en cazador de demonios tras encontrar a su familia masacrada por un demonio, con su hermana como única sobreviviente convertida en demonio.",poster:"/xUfRZu2mi8jH6SzQEJGP6tjBuYj.jpg",banner:"/9O7gLzmreU0nGkIB6K3BsJbzvNv.jpg",genres:["Acción","Aventura","Sobrenatural"],year:"2019",type:"series",vis:"public",uid:"owner",eps:[{n:1,title:"Crueldad",desc:"Tanjiro descubre la masacre de su familia.",embed:"https://www.youtube.com/embed/VQGCKyvzIM4"},{n:2,title:"El Hombre que se Vuelve Fuerte",desc:"Tanjiro comienza su entrenamiento.",embed:"https://www.youtube.com/embed/VQGCKyvzIM4"}],createdAt:Date.now()-86400000*2},
+      {id:1003,tmdbId:129,title:"El Viaje de Chihiro",synopsis:"Una niña de diez años cae accidentalmente en un mundo mágico habitado por dioses y espíritus, donde sus padres son transformados en cerdos.",poster:"/39wmItIWsg5sZMyRUHLkWBcuVCM.jpg",banner:"/Ab8mkHmkYADjU7wQiOkia9BzGvS.jpg",genres:["Animación","Aventura","Familia","Fantasía"],year:"2001",type:"movie",vis:"public",uid:"owner",eps:[{n:1,title:"Película Completa",desc:"Premio Óscar a la mejor película animada.",embed:"https://www.youtube.com/embed/ByXuk9QqQkk"}],createdAt:Date.now()-86400000},
+      {id:1004,tmdbId:31911,title:"Fullmetal Alchemist: Brotherhood",synopsis:"Dos hermanos alquimistas buscan la Piedra Filosofal para recuperar sus cuerpos perdidos en un intento fallido de resucitar a su madre.",poster:"/5ZFUEOULaVml7ozEHLJOdMqkJqS.jpg",banner:"/jtAI6OJIWLWiRItNSZoWjrsUtmi.jpg",genres:["Acción","Aventura","Fantasía","Drama"],year:"2009",type:"series",vis:"public",uid:"owner",eps:[{n:1,title:"Lágrimas de Acero",desc:"Flashback de los hermanos Elric.",embed:"https://www.youtube.com/embed/--IcmZkvL0Q"},{n:2,title:"El Perro del Ejército Militar",desc:"Edward es llamado el 'Perro del Estado'.",embed:"https://www.youtube.com/embed/--IcmZkvL0Q"}],createdAt:Date.now()-3600000},
+    ];
+    DB.saveAnime(demo);
+  }
+  handleHash();
+  if(S.page!=='admin-secret')render();
+}
+
+// expose globals
+window.nav=nav;window.logout=logout;window.heroGo=heroGo;
+window.setAdmin=setAdmin;window.refreshAdmin=refreshAdmin;window.refreshHome=refreshHome;
+window.switchTab=switchTab;window.doLogin=doLogin;window.doReg=doReg;
+window.doTmSearch=doTmSearch;window.doDiscover=doDiscover;window.doImport=doImport;
+window.openEpModal=openEpModal;window.editEp=editEp;window.openBulk=openBulk;
+window.saveEp=saveEp;window.saveBulk=saveBulk;window.delEp=delEp;window.delAnime=delAnime;
+window.setVis=setVis;window.copyCode=copyCode;
+window.S=S;
+
+init();
+</script>
+</body>
+</html>
